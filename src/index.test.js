@@ -23,11 +23,10 @@ const laterResolvedValues = (type) => {
 
 describe('testing graphql', async () => {
     await driver.session().run(` match (n) detach delete n`);
-    const myKratosId = Math.random().toString(36).slice(2, 7);
+    const myUserId = Math.random().toString(36).slice(2, 7);
     const neo4jGraphql = new Neo4jGraphQL({typeDefs: readFileSync(join(__dirname, 'schema.graphql'), 'utf8').toString(), driver});
-    const neoSchema = await neo4jGraphql.getSchema();
     const apolloServer = new ApolloServer({
-        schema: neoSchema,
+        schema: await neo4jGraphql.getSchema(),
         introspection: true,
     });
     const l = laterResolvedValues('string');
@@ -48,16 +47,14 @@ describe('testing graphql', async () => {
             input: {
                 admins: {
                     create: {
-                        node: {userId: myKratosId},
+                        node: {userId: myUserId},
                     },
                 }
             },
         };
         const r = await apolloServer.executeOperation(
             {query: ADD_TENANT, variables: tenantVariables},
-            //  we actually currently NEED to have adminId match the created admin, cause we query admins
-            //  but  probably overlords  should be able to query all users?
-            {contextValue: {jwt: {roles: ['overlord'], id: myKratosId, sub: ''}}}
+            {contextValue: {jwt: {id: myUserId}}}
         );
         expect(r).toMatchObject({
             body: {
@@ -65,7 +62,7 @@ describe('testing graphql', async () => {
                     data: {
                         createTenants: {
                             tenants: [
-                                {id: expect.any(String), admins: [{userId: myKratosId}]},
+                                {id: expect.any(String), admins: [{userId: myUserId}]},
                             ],
                         },
                     },
@@ -98,7 +95,7 @@ describe('testing graphql', async () => {
         });
         const r = await apolloServer.executeOperation(
             {query: ADD_GARAGES, variables: {input: garageInput(l.get('tenantId'))}},
-            {contextValue: {jwt: {roles: [], id: l.get('userId'), sub: ''}}}
+            {contextValue: {jwt: {id: l.get('userId')}}}
         );
         expect(r).toMatchObject({
             body: {
@@ -148,7 +145,7 @@ describe('testing graphql', async () => {
                     }),
                 },
             },
-            {contextValue: {jwt: {roles: [], id: l.get('userId'), sub: ''}}}
+            {contextValue: {jwt: {id: l.get('userId')}}}
         );
         expect(r).toMatchObject({
             body: {

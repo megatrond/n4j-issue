@@ -1,7 +1,5 @@
 type JWT @jwt {
-    roles: [String]
     id: String
-    sub: String
 }
 type User
     @authorization(
@@ -35,9 +33,10 @@ type Garage
 }
 
 
+# if  i  set when: [BEFORE], it also works
 type VehicleCard
     @authorization(
-        validate: [{  where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
+        validate: [{   where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
     ) {
     id: ID! @id
     garages: [Garage!]! @relationship(type: "VALID_GARAGES", direction: OUT)
