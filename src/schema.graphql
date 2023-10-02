@@ -26,19 +26,17 @@ type Tenant
 
 type Garage
     @authorization(
-        validate: [{  where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
+        validate: [{ where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
     ) {
     id: ID! @id
     tenant: Tenant! @relationship(type: "TENANT_HAS_GARAGE", direction: OUT)
 }
 
-
-# if  i  set when: [BEFORE], it also works
 type VehicleCard
     @authorization(
-        validate: [{   where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
+        validate: [{ where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
     ) {
     id: ID! @id
     garages: [Garage!]! @relationship(type: "VALID_GARAGES", direction: OUT)
-    tenant: Tenant! @relationship(type: "VEHICLECARD_OWNER", direction: OUT)
+    tenant: Tenant! @relationship(type: "VEHICLECARD_OWNER", direction: OUT) # <---  this line
 }

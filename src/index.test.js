@@ -124,7 +124,6 @@ describe('testing graphql', async () => {
                     },
                 },
             },
-            // if i comment out this, it works
             garages: {
                 connect: {
                     where: {
