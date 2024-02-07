@@ -1,20 +1,15 @@
 {
-  "name": "ffs",
+  "name": "n4j-issue",
   "version": "1.0.0",
   "main": "index.js",
+  "repository": "git@github.com:megatrond/n4j-issue.git",
+  "author": "Trond Sørås <trond@dx.no>",
   "license": "MIT",
-  "devDependencies": {
-    "@apollo/client": "^3.8.4",
-    "vitest": "^0.34.5"
-  },
-  "scripts": {
-    "test": "vitest run",
-    "watch-test": "vitest watch"
-  },
+  "type": "module",
   "dependencies": {
-    "@apollo/server": "^4.9.3",
-    "@neo4j/graphql": "^4.2.0",
+    "@apollo/server": "^4.10.0",
+    "@neo4j/graphql": "^4.4.5",
     "graphql": "^16.8.1",
-    "neo4j-driver": "^5.12.0"
+    "neo4j-driver": "^5.17.0"
   }
 }

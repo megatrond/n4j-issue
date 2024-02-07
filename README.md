@@ -1,43 +1,33 @@
-# Example of neo4j/graphql issue
-
-Run tests by executing following commands:
 ```
-yarn install
-./test.sh watch-test
+mutation {
+  createMyThings(input: [{}, {}, {}]) {
+    myThings {
+      id
+      stuff {
+        id
+      }
+    }
+  }
+  createMyStuffs(input: [{}, {}, {}]) {
+    myStuffs {
+      id
+      thing {
+        id
+      }
+    }
+  }
+}
 ```
-Test should now fail with:
+Then connect one of the things to one of the stuff, and run the following query:
 ```
-...snipped...
--               "id": Any<String>,
-+           "extensions": Object {
-+             "code": "INTERNAL_SERVER_ERROR",
-+             "stacktrace": Array [
-+               "Neo4jGraphQLForbiddenError: Forbidden",
-...snipped...
-```
-Now if you change the following type in schema.graphql:
-```
-type VehicleCard
-    @authorization(
-        validate: [{ where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
-    ) {
-    id: ID! @id
-    garages: [Garage!]! @relationship(type: "VALID_GARAGES", direction: OUT)
-    tenant: Tenant! @relationship(type: "VEHICLECARD_OWNER", direction: OUT) # <---  this line
+query {
+  myThings(where: {stuff: null}) {
+    id
+    stuff {
+      id
+    }
+  }
 }
 ```
 
-By move the pointed to line up so the type will look like this:
-```
-type VehicleCard
-    @authorization(
-        validate: [{ where: { node: { tenant: { admins: { userId: "$jwt.id" } } } } }]
-    ) {
-    id: ID! @id
-    tenant: Tenant! @relationship(type: "VEHICLECARD_OWNER", direction: OUT) # <---  this line
-    garages: [Garage!]! @relationship(type: "VALID_GARAGES", direction: OUT)
-}
-```
-Tests will now pass...
-(you can force save index.test.js to force rerun of tests)
-
+it now returns all 3 things, even if one of them is connected to a stuff
